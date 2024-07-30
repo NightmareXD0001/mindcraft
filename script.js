@@ -1,9 +1,36 @@
 q1 = "hello";
 qNum = 0;
-totalQ = 11;
+totalQ = 13;
 score = 0;
 answer = Array(totalQ - 1);
 corrAns = Array(totalQ - 1);
+username = "null";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+  child,
+} from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDUeIf5A92cxymtacZ8IxvlIxE7pT9sJWo",
+  authDomain: "matrix-mindcraft.firebaseapp.com",
+  databaseURL:
+    "https://matrix-mindcraft-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "matrix-mindcraft",
+  storageBucket: "matrix-mindcraft.appspot.com",
+  messagingSenderId: "269035655467",
+  appId: "1:269035655467:web:5e388db04c11078b74f56e",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+//get ref to database services
+const db = getDatabase(app);
 
 function nextQ() {
   //declaring objects
@@ -17,7 +44,9 @@ function nextQ() {
 
   //creating an array for storing questions and correct answers
   question = [
-    "question 1 placeholder",
+    "placeholder",
+    "Enter Your Password",
+    "Send a message in a bottle €",
     "$$$",
     "fungal disease from Home.",
     "49 54 56 53 13 10  u0076\\u0065\\u0067\\u0065\\u0074 \\u0061\\u0072\\u0069\\u0061\\u006e\\u000d -- ELLA",
@@ -31,6 +60,8 @@ function nextQ() {
   ];
 
   image = [
+    "",
+    "",
     "css/Q1.jpg",
     "css/Q2.jpg",
     "css/Q3.png",
@@ -45,6 +76,8 @@ function nextQ() {
   ];
 
   corrAns = [
+    "",
+    "",
     "georgestafford",
     "3.47",
     "phacidiaceae",
@@ -57,31 +90,56 @@ function nextQ() {
     "mercedesclr",
     "nilu27",
   ];
-
-  //SAVING ANSWER ----
-  answer[qNum] = ans.value;
-
-  ans.style.outlineColor = "red";
-
-  //calculating score
-  if (answer[qNum] == corrAns[qNum]) {
-    //RESETTING VALUE OF TEXTBOX AND COLOR----
-    ans.value = "";
-    ans.style.outlineColor = "#222";
-
-    //ADDING TO TOTAL NO. OF QUESTIONS AND SCORE----
-    qNum++;
-    score++;
-
-    //CHANGING QUESTION TEXT AND IMAGE------
-    img.src = image[qNum];
-    quesTxt.innerText = qNum + 1 + "." + " " + question[qNum];
+  if (qNum == 0) {
+    username = ans.value;
   }
+  if (qNum == 1) {
+    const dbRef = ref(database, "user/" + username + "/password");
+    // Read the data
+    get(dbRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          console.log(snapshot.val());
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  } else {
+    //SAVING ANSWER ----
+    answer[qNum] = ans.value;
 
-  //ENDING
-  if (qNum > totalQ - 1) {
-    //making end screen visible
-    qnaScr.style.visibility = "hidden";
-    endScr.style.visibility = "visible";
+    ans.style.outlineColor = "red";
+
+    //calculating score
+    if (answer[qNum] == corrAns[qNum]) {
+      //RESETTING VALUE OF TEXTBOX AND COLOR----
+      ans.value = "";
+      ans.style.outlineColor = "#222";
+
+      //ADDING TO TOTAL NO. OF QUESTIONS AND SCORE----
+      qNum++;
+      score++;
+      document.getElementById("submit").addEventListener("click", function (e) {
+        e.preventDefault();
+        set(ref(db, "user/" + document.getElementById("username").value), {
+          username: document.getElementById("username").value,
+          email: document.getElementById("email").value,
+          score: score.value,
+        });
+        alert("Sucessfull!");
+      });
+
+      //CHANGING QUESTION TEXT AND IMAGE------
+      img.src = image[qNum];
+      quesTxt.innerText = qNum + 1 + "." + " " + question[qNum];
+    }
+
+    //ENDING
+    if (qNum > totalQ - 1) {
+      //making end screen visible
+      qnaScr.style.visibility = "hidden";
+      endScr.style.visibility = "visible";
+    }
   }
 }
