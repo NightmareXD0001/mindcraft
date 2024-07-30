@@ -2,10 +2,8 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>MINDCRAFTwww</title>
+    <title>MINDCRAFT</title>
     <link rel="stylesheet" href="css/style.css" />
-
-    <script src="script.js"></script>
   </head>
   <body>
     <section>
@@ -62,27 +60,30 @@
       <span></span> <span></span> <span></span> <span></span> <span></span>
       <span></span> <span></span> <span></span> <span></span> <span></span>
       <span></span> <span></span> <span></span> <span></span> <span></span>
-
-      <div class="box" id="qnaScr">
-        <p id="question">Enter your Username</p>
-        <p id="alignCenter">
-          <image id="qImg" src="" alt="Image"></image>
-        </p>
-        <input type="text" id="answer" placeholder="Enter your answer" />
-        <input type="button" value="Check" onclick="nextQ();" id="nextButton" />
-      </div>
-
-      <div class="box" id="endScr">
-        <h2 style="margin-top: 100px">FINISHED</h2>
-      </div>
+      <span></span> <span></span> <span></span> <span></span> <span></span>
+      <span></span> <span></span> <span></span> <span></span> <span></span>
+      <span></span> <span></span> <span></span> <span></span> <span></span>
+      <span></span> <span></span> <span></span> <span></span> <span></span>
+      <span></span> <span></span> <span></span> <span></span> <span></span>
+      <span></span> <span></span> <span></span> <span></span> <span></span>
+      <span></span> <span></span> <span></span> <span></span> <span></span>
+      <span></span> <span></span> <span></span> <span></span> <span></span>
+      <span></span> <span></span> <span></span> <span></span> <span></span>
+      <span></span> <span></span> <span></span> <span></span> <span></span>
+      <span></span> <span></span> <span></span> <span></span> <span></span>
+      <span></span> <span></span> <span></span> <span></span> <span></span>
       <script type="module">
+        document
+          .getElementById("nextButton")
+          .addEventListener("click", function () {
+            nextQ();
+          });
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
         import {
           getDatabase,
           ref,
-          set,
           get,
-          child,
         } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
 
         // Your web app's Firebase configuration
@@ -105,13 +106,27 @@
 
         let qNum = 0;
         const totalQ = 13;
+        let username = "idk";
         let score = 0;
-        const answer = Array(totalQ - 1);
-        const corrAns = Array(totalQ - 1);
-        let username = "null";
+        const answer = Array(totalQ).fill("");
+        const corrAns = [
+          "",
+          "",
+          "georgestafford",
+          "3.47",
+          "phacidiaceae",
+          "livonianwar",
+          "siriusblack",
+          "fatman",
+          "mackenziemcdonald",
+          "helenbrawn",
+          "canada",
+          "mercedesclr",
+          "nilu27",
+        ];
 
         function nextQ() {
-          // Declaring objects
+          //declaring objects
           const btn = document.getElementById("nextButton");
           const quesTxt = document.getElementById("question");
           const ans = document.getElementById("answer");
@@ -120,10 +135,10 @@
           const scoreTxt = document.getElementById("score");
           const img = document.getElementById("qImg");
 
-          // Creating an array for storing questions and correct answers
+          //creating an array for storing questions and correct answers
           const question = [
-            "placeholder",
-            "Enter Your Password",
+            "Enter Username",
+            "Enter Password",
             "Send a message in a bottle €",
             "$$$",
             "fungal disease from Home.",
@@ -153,27 +168,11 @@
             "",
           ];
 
-          const corrAns = [
-            "",
-            "",
-            "georgestafford",
-            "3.47",
-            "phacidiaceae",
-            "LIVONIANWAR",
-            "siriusblack",
-            "fatman",
-            "mackenziemcdonald",
-            "helenbrawn",
-            "canada",
-            "mercedesclr",
-            "nilu27",
-          ];
-
-          if (qNum == 0) {
+          if (qNum === 0) {
             username = ans.value;
             ans.value = ""; // Clear the input
             qNum++;
-          } else if (qNum == 1) {
+          } else if (qNum === 1) {
             const dbRef = ref(db, "user/" + username + "/password");
             // Read the data
             get(dbRef)
@@ -185,56 +184,61 @@
                     qNum++;
                   } else {
                     alert("Incorrect password");
+                    ans.style.outlineColor = "#red";
                   }
                 } else {
                   alert("No such user");
+                  ans.style.outlineColor = "#red";
                 }
               })
               .catch((error) => {
                 console.error(error);
               });
           } else {
-            // Saving answer
+            //SAVING ANSWER ----
             answer[qNum] = ans.value;
+
             ans.style.outlineColor = "red";
 
-            // Calculating score
-            if (answer[qNum] == corrAns[qNum]) {
-              // Resetting value of textbox and color
+            //calculating score
+            if (answer[qNum] === corrAns[qNum]) {
+              //RESETTING VALUE OF TEXTBOX AND COLOR----
               ans.value = "";
               ans.style.outlineColor = "#222";
 
-              // Adding to total number of questions and score
+              //ADDING TO TOTAL NO. OF QUESTIONS AND SCORE----
               qNum++;
               score++;
             }
+          }
 
-            // Changing question text and image
-            if (qNum < totalQ) {
-              img.src = image[qNum];
-              quesTxt.innerText = qNum + 1 + ". " + question[qNum];
-            }
+          //CHANGING QUESTION TEXT AND IMAGE------
+          img.src = image[qNum];
+          quesTxt.innerText = qNum - 1 + "." + " " + question[qNum];
 
-            // Ending
-            if (qNum >= totalQ) {
-              // Making end screen visible
-              qnaScr.style.visibility = "hidden";
-              endScr.style.visibility = "visible";
-
-              // Saving score to database
-              set(ref(db, "user/" + username), {
-                score: score,
-              })
-                .then(() => {
-                  alert("Successful!");
-                })
-                .catch((error) => {
-                  console.error(error);
-                });
-            }
+          //ENDING
+          if (qNum >= totalQ) {
+            //making end screen visible
+            qnaScr.style.visibility = "hidden";
+            endScr.style.visibility = "visible";
+            scoreTxt.innerText = "Score: " + score;
           }
         }
       </script>
+
+      <div class="box" id="qnaScr">
+        <p id="question">Enter Username</p>
+        <p id="alignCenter">
+          <img id="qImg" src="" alt="Image in Question" />
+        </p>
+        <input type="text" id="answer" placeholder="Enter your answer" />
+        <input type="button" value="Check" id="nextButton" />
+      </div>
+
+      <div class="box" id="endScr" style="visibility: hidden">
+        <h2 style="margin-top: 100px">FINISHED</h2>
+        <p id="score"></p>
+      </div>
     </section>
   </body>
 </html>
