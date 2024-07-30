@@ -173,7 +173,6 @@
             username = ans.value;
             ans.value = ""; // Clear the input
             qNum++;
-            nextQ();
           } else if (qNum == 1) {
             const dbRef = ref(db, "user/" + username + "/password");
             // Read the data
@@ -184,7 +183,6 @@
                   if (ans.value === password) {
                     ans.value = ""; // Clear the input
                     qNum++;
-                    nextQ();
                   } else {
                     alert("Incorrect password");
                   }
