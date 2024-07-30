@@ -83,6 +83,7 @@
         import {
           getDatabase,
           ref,
+          update,
           get,
         } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
 
@@ -200,22 +201,24 @@
 
             //calculating score
             if (answer[qNum] === corrAns[qNum]) {
+              qNum++;
+              score++;
+              const userRef = ref(db, "user/" + username);
+              update(userRef, {
+                finalscore: score,
+              })
+                .then(() => {
+                  console.log("Score updated successfully!");
+                })
+                .catch((error) => {
+                  console.error("Error updating score:", error);
+                });
+
               //RESETTING VALUE OF TEXTBOX AND COLOR----
               ans.value = "";
               ans.style.outlineColor = "#222";
 
               //ADDING TO TOTAL NO. OF QUESTIONS AND SCORE----
-              qNum++;
-              score++;
-              set(ref(db, "user/" + username), {
-                score: score,
-              })
-                .then(() => {
-                  alert("Successful!");
-                })
-                .catch((error) => {
-                  console.error(error);
-                });
             }
           }
 
