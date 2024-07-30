@@ -209,6 +209,15 @@
               //ADDING TO TOTAL NO. OF QUESTIONS AND SCORE----
               qNum++;
               score++;
+              set(ref(db, "user/" + username), {
+                score: score,
+              })
+                .then(() => {
+                  alert("Successful!");
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
             }
           }
 
