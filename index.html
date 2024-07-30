@@ -75,14 +75,7 @@
       <div class="box" id="endScr">
         <h2 style="margin-top: 100px">FINISHED</h2>
       </div>
-      <script>
-        q1 = "hello";
-        qNum = 0;
-        totalQ = 13;
-        score = 0;
-        answer = Array(totalQ - 1);
-        corrAns = Array(totalQ - 1);
-        username = "null";
+      <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
         import {
           getDatabase,
@@ -107,11 +100,18 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
 
-        //get ref to database services
+        // Get a reference to the database service
         const db = getDatabase(app);
 
+        let qNum = 0;
+        const totalQ = 13;
+        let score = 0;
+        const answer = Array(totalQ - 1);
+        const corrAns = Array(totalQ - 1);
+        let username = "null";
+
         function nextQ() {
-          //declaring objects
+          // Declaring objects
           const btn = document.getElementById("nextButton");
           const quesTxt = document.getElementById("question");
           const ans = document.getElementById("answer");
@@ -120,8 +120,8 @@
           const scoreTxt = document.getElementById("score");
           const img = document.getElementById("qImg");
 
-          //creating an array for storing questions and correct answers
-          question = [
+          // Creating an array for storing questions and correct answers
+          const question = [
             "placeholder",
             "Enter Your Password",
             "Send a message in a bottle €",
@@ -137,7 +137,7 @@
             "lamborghini-->pagani \n koenigsegg--> ? ",
           ];
 
-          image = [
+          const image = [
             "",
             "",
             "css/Q1.jpg",
@@ -153,7 +153,7 @@
             "",
           ];
 
-          corrAns = [
+          const corrAns = [
             "",
             "",
             "georgestafford",
@@ -168,60 +168,71 @@
             "mercedesclr",
             "nilu27",
           ];
+
           if (qNum == 0) {
             username = ans.value;
+            ans.value = ""; // Clear the input
+            qNum++;
             nextQ();
-          }
-          if (qNum == 1) {
-            const dbRef = ref(database, "user/" + username + "/password");
+          } else if (qNum == 1) {
+            const dbRef = ref(db, "user/" + username + "/password");
             // Read the data
             get(dbRef)
               .then((snapshot) => {
                 if (snapshot.exists()) {
-                  console.log(snapshot.val());
-                  if ((password = snapshot.val)) {
+                  const password = snapshot.val();
+                  if (ans.value === password) {
+                    ans.value = ""; // Clear the input
+                    qNum++;
                     nextQ();
+                  } else {
+                    alert("Incorrect password");
                   }
+                } else {
+                  alert("No such user");
                 }
               })
               .catch((error) => {
                 console.error(error);
               });
           } else {
-            //SAVING ANSWER ----
+            // Saving answer
             answer[qNum] = ans.value;
-
             ans.style.outlineColor = "red";
 
-            //calculating score
+            // Calculating score
             if (answer[qNum] == corrAns[qNum]) {
-              //RESETTING VALUE OF TEXTBOX AND COLOR----
+              // Resetting value of textbox and color
               ans.value = "";
               ans.style.outlineColor = "#222";
-              nextQ();
-              //ADDING TO TOTAL NO. OF QUESTIONS AND SCORE----
+
+              // Adding to total number of questions and score
               qNum++;
               score++;
-              document
-                .getElementById("submit")
-                .addEventListener("click", function (e) {
-                  e.preventDefault();
-                  set(ref(db, "user/" + username.value), {
-                    score: score.value,
-                  });
-                  alert("Sucessfull!");
-                });
-
-              //CHANGING QUESTION TEXT AND IMAGE------
-              img.src = image[qNum];
-              quesTxt.innerText = qNum + 1 + "." + " " + question[qNum];
             }
 
-            //ENDING
-            if (qNum > totalQ - 1) {
-              //making end screen visible
+            // Changing question text and image
+            if (qNum < totalQ) {
+              img.src = image[qNum];
+              quesTxt.innerText = qNum + 1 + ". " + question[qNum];
+            }
+
+            // Ending
+            if (qNum >= totalQ) {
+              // Making end screen visible
               qnaScr.style.visibility = "hidden";
               endScr.style.visibility = "visible";
+
+              // Saving score to database
+              set(ref(db, "user/" + username), {
+                score: score,
+              })
+                .then(() => {
+                  alert("Successful!");
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
             }
           }
         }
